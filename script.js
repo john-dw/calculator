@@ -16,11 +16,15 @@ function divide(nbr1, nbr2) {
 
 function operate(operator, nbr1, nbr2) {
     switch(operator) {
-        case "add": return add(nbr1, nbr2);
-        case "substract": return substract(nbr1, nbr2);
-        case "multiply": return multiply(nbr1, nbr2);
-        case "divide": return divide(nbr1, nbr2);
-        default: return "Error: please enter a valid operation";
+        case "add": display.textContent = `${add(nbr1, nbr2)}`;
+        break;
+        case "substract": display.textContent = substract(nbr1, nbr2);
+        break;
+        case "multiply": display.textContent = multiply(nbr1, nbr2);
+        break;
+        case "divide": display.textContent = divide(nbr1, nbr2);
+        break;
+        default: display.textContent = "Error";
     }
 }
 
@@ -31,6 +35,8 @@ const operators = document.querySelectorAll(".operator");
 const clear = document.querySelector("#clear");
 const negative = document.querySelector("#negative");
 const percentage = document.querySelector("#percentage");
+const equal = document.querySelector("#equal");
+const float = document.querySelector("#float");
 
 /*
 eventlistener on numbers
@@ -44,22 +50,46 @@ call operator functions, show result on screen, wait for other operator and next
 let nbr1 = 0;
 let nbr2 = 0;
 let operatorEntered = "";
+let operatorActivated = false;
 
 function addToScreen(number) {
+    if(display.textContent === "0" || display.textContent === "Error") {
+        display.textContent = "";
+    }
     display.textContent += `${number}`; 
 }
 
 numbers.forEach((number) => {
     number.addEventListener("click", (e) => {
+        if (operatorActivated) {
+            display.textContent = "";
+            operatorActivated = false;
+        }
         addToScreen(number.id);
-        nbr1 = nbr1 * 10 + parseInt(number.id);
     })
 })
 
 operators.forEach((operator) => {
     operator.addEventListener("click", (e) => {
+        if(operatorEntered) {
+            getResult();
+        }
         operatorEntered = `${operator.id}`;
+        operatorActivated = true;
+        nbr1 = parseFloat(display.textContent);
     })
+})
+
+function getResult() {
+    nbr2 = parseFloat(display.textContent);
+    operate(operatorEntered, nbr1, nbr2);
+    nbr1 = parseFloat(display.textContent);
+    nbr2 = 0;
+    operatorEntered = "";
+}
+
+equal.addEventListener("click", (e) => {
+    getResult();
 })
 
 clear.addEventListener("click", (e) => {
@@ -70,9 +100,15 @@ clear.addEventListener("click", (e) => {
 })
 
 negative.addEventListener("click", (e) => {
-
+    display.textContent = `${parseFloat(display.textContent) * -1}`;
 })
 
 percentage.addEventListener("click", (e) => {
-    
+    display.textContent = `${parseFloat(display.textContent) / 100}`;
+})
+
+float.addEventListener("click", (e) => {
+    if (!display.textContent.includes(".")) {
+        display.textContent += ".";
+    }
 })
